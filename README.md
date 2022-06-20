@@ -1,5 +1,6 @@
 # kafka-consumer-opensearch
-To learn Kafka
+
+Related repository - [kafka-producer-wikimedia](https://github.com/dhanoopbhaskar/kafka-producer-wikimedia)
 
 ## [Docker quickstart](https://opensearch.org/docs/latest/#docker-quickstart)
 - Install and start Docker Desktop. 
