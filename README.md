@@ -7,39 +7,39 @@ Related repository - [kafka-producer-wikimedia](https://github.com/dhanoopbhaska
 - Run the following commands:
 
     
-    docker pull opensearchproject/opensearch:2.0.1
+        docker pull opensearchproject/opensearch:2.0.1
    
-    docker run -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:2.0.1
+        docker run -p 9200:9200 -p 9600:9600 -e "discovery.type=single-node" opensearchproject/opensearch:2.0.1
 
 - In a new terminal session, run:
 
     
-    curl -XGET --insecure -u 'admin:admin' 'https://localhost:9200'
+        curl -XGET --insecure -u 'admin:admin' 'https://localhost:9200'
 
 - Create your first index.
 
 
-    curl -XPUT --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index'
+        curl -XPUT --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index'
 
 - Add some data to your newly created index.
 
 
-    curl -XPUT --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/_doc/1' -H 'Content-Type: application/json' -d '{"Description": "To be or not to be, that is the question."}'
+        curl -XPUT --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/_doc/1' -H 'Content-Type: application/json' -d '{"Description": "To be or not to be, that is the question."}'
 
 - Retrieve the data to see that it was added properly.
 
 
-    curl -XGET --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/_doc/1'
+        curl -XGET --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/_doc/1'
 
 - After verifying that the data is correct, delete the document.
 
 
-    curl -XDELETE --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/_doc/1'
+        curl -XDELETE --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/_doc/1'
 
 - Finally, delete the index.
 
 
-    curl -XDELETE --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/'
+        curl -XDELETE --insecure -u 'admin:admin' 'https://localhost:9200/my-first-index/'
 
 
 

@@ -11,6 +11,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.client.RequestOptions;
@@ -123,15 +125,34 @@ public class OpenSearchConsumer {
                 int recordCount = records.count();
                 log.info("Received " + recordCount + " record(s)");
 
+                // create bulk request
+                BulkRequest bulkRequest = new BulkRequest();
+
                 for (ConsumerRecord<String, String> record : records) {
                     try {
                         // create request to send record to Open Search
                         IndexRequest indexRequest = new IndexRequest(indexName).source(record.value(), XContentType.JSON);
-                        IndexResponse indexResponse = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
-                        log.info("Inserted: " + indexResponse.getId());
+                        // add to bulk request
+                        bulkRequest.add(indexRequest);
                     } catch (Exception exp) {
-                        log.error("Exception occurred while inserting into Open Search: ", exp);
+                        log.error("Exception occurred: ", exp);
                     }
+                }
+
+                // insert bulk request
+                if (bulkRequest.numberOfActions() > 0){
+                    BulkResponse bulkResponse = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    log.info("Inserted " + bulkResponse.getItems().length + " record(s).");
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    // commit offsets after the batch is consumed
+                    consumer.commitSync();
+                    log.info("Offsets have been committed!");
                 }
             }
         }
