@@ -1,5 +1,6 @@
 package in.theinsanetechie;
 
+import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -130,8 +132,16 @@ public class OpenSearchConsumer {
 
                 for (ConsumerRecord<String, String> record : records) {
                     try {
+                        // to make the consumer idempotent
+
+                        // define an id for each record using Kafka record coordinates
+                        String id = record.topic() + "_" + record.partition() + "_" + record.offset();
+
                         // create request to send record to Open Search
-                        IndexRequest indexRequest = new IndexRequest(indexName).source(record.value(), XContentType.JSON);
+                        IndexRequest indexRequest = new IndexRequest(indexName)
+                                .source(record.value(), XContentType.JSON)
+                                .id(id); // add id
+
                         // add to bulk request
                         bulkRequest.add(indexRequest);
                     } catch (Exception exp) {
@@ -143,6 +153,9 @@ public class OpenSearchConsumer {
                 if (bulkRequest.numberOfActions() > 0){
                     BulkResponse bulkResponse = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
                     log.info("Inserted " + bulkResponse.getItems().length + " record(s).");
+
+                    // iterate and log the id values
+                    Arrays.stream(bulkResponse.getItems()).forEach(response -> log.info(response.getId()));
 
                     try {
                         Thread.sleep(1000);
