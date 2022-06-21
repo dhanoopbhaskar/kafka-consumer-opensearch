@@ -3,6 +3,7 @@
 Related repository - [kafka-producer-wikimedia](https://github.com/dhanoopbhaskar/kafka-producer-wikimedia)
 
 ## [Docker quickstart](https://opensearch.org/docs/latest/#docker-quickstart)
+
 - Install and start Docker Desktop. 
 - Run the following commands:
 
@@ -60,5 +61,5 @@ if installed using brew,
 ## Create a topic
     kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic wikimedia.recentChanges
 
-### Read from the topic
+## Read from the topic
     kafka-console-consumer --bootstrap-server localhost:9092 --topic wikimedia.recentChanges
