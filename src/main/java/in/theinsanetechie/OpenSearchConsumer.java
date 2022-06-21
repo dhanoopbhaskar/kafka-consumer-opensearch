@@ -93,6 +93,22 @@ public class OpenSearchConsumer {
         return new KafkaConsumer<>(properties);
     }
 
+    /**
+     * Extract id from the wikimedia data
+     *
+     * @param wikimedia data in json format
+     * @return the extracted id
+     */
+    private static String extractId(String json){
+        // gson library
+        return JsonParser.parseString(json)
+                .getAsJsonObject()
+                .get("meta")
+                .getAsJsonObject()
+                .get("id")
+                .getAsString();
+    }
+
     public static void main(String[] args) throws IOException {
         // logger
         Logger log = LoggerFactory.getLogger(OpenSearchConsumer.class.getSimpleName());
@@ -135,7 +151,10 @@ public class OpenSearchConsumer {
                         // to make the consumer idempotent
 
                         // define an id for each record using Kafka record coordinates
-                        String id = record.topic() + "_" + record.partition() + "_" + record.offset();
+                        // String id = record.topic() + "_" + record.partition() + "_" + record.offset();
+
+                        // extract the ID from the JSON value
+                        String id = extractId(record.value());
 
                         // create request to send record to Open Search
                         IndexRequest indexRequest = new IndexRequest(indexName)
